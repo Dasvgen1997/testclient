@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
-import "./AddPostModal.sass";
+import "./FilterModal.sass";
 
 import axios from "axios";
+
+import { Post } from "../../interfaces/Post.interface";
 
 interface Props {
   show: boolean;
   closeHandler: Function;
-  addHandler: Function;
+  setPostsAndFlag: Function;
 }
 
-const Modal: React.FC<Props> = ({ show, closeHandler, addHandler }) => {
+const FilterModal: React.FC<Props> = ({
+  show,
+  closeHandler,
+  setPostsAndFlag,
+}) => {
   const [title, setTitle] = useState<string>("");
   const [body, setBody] = useState<string>("");
 
@@ -24,54 +30,58 @@ const Modal: React.FC<Props> = ({ show, closeHandler, addHandler }) => {
     }
   }, [show]);
 
-  const isFullFields = title && body;
-
-  const fetchAdd = (e) => {
+  const searchHandler = (e) => {
     e.preventDefault();
+
     axios
-      .post(`/posts`, {
-        title,
-        body,
+      .get(`/posts/search`, {
+        params: {
+          title,
+          body,
+        },
       })
       .then(({ data }) => {
-        addHandler(data);
+        setPostsAndFlag(data);
+        // addHandler(data);
         closeHandler();
       })
-      .catch((error) => {
-        console.error("Error:", error);
+      .catch((e) => {
+        console.error("Error:", e);
       });
   };
+
+  let isOneFeildExist = title || body;
 
   if (!show) return null;
 
   return (
-    <div className="AddPostModal">
-      <div className="AddPostModal_window">
-        <header className="AddPostModal_header">
-          <h4>Добавить пост</h4>
+    <div className="PostModal">
+      <div className="PostModal_window">
+        <header className="PostModal_header">
+          <h4>Поиск постов</h4>
           <button onClick={() => closeHandler()}>закрыть</button>
         </header>
-        <form onSubmit={fetchAdd}>
+        <form onSubmit={searchHandler}>
           <input
             value={title}
             type="text"
-            className="AddPostModal_title-input"
+            className="PostModal_title-input"
             placeholder="Заголовок"
             onChange={(e) => setTitle(e.target.value)}
           />
           <textarea
             value={body}
             placeholder="Тело"
-            className="AddPostModal_body-input"
+            className="PostModal_body-input"
             rows={4}
             onChange={(e) => setBody(e.target.value)}
           />
           <button
-            disabled={!isFullFields}
-            className="AddPostModal_submit"
+            disabled={!isOneFeildExist}
+            className="PostModal_submit"
             type="submit"
           >
-            Добавить
+            Искать
           </button>
         </form>
       </div>
@@ -79,4 +89,4 @@ const Modal: React.FC<Props> = ({ show, closeHandler, addHandler }) => {
   );
 };
 
-export default Modal;
+export default FilterModal;

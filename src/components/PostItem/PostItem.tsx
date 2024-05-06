@@ -7,6 +7,7 @@ interface Props {
   createdAt: string;
   id: number;
   deleteItemHandler: Function;
+  editHandler: Function;
 }
 
 const PostItem: React.FC<Props> = ({
@@ -15,6 +16,7 @@ const PostItem: React.FC<Props> = ({
   body,
   createdAt,
   deleteItemHandler,
+  editHandler,
 }) => {
   return (
     <div className="post-item">
@@ -30,6 +32,7 @@ const PostItem: React.FC<Props> = ({
       >
         Удалить
       </button>
+      <button onClick={() => editHandler()}>Изменить</button>
     </div>
   );
 };
